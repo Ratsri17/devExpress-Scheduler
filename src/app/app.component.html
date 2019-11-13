@@ -1,31 +1,80 @@
 <div>
-    <h1>Calender</h1>
+    <h1>Events Calender</h1>
 </div>
+
 <dx-scheduler
-    [dataSource]="appointmentsData"
-    [views]='["timelineDay", "timelineWeek", "timelineWorkWeek", "timelineMonth"]'
+    id="scheduler"
+    [dataSource]="data"
+    [views]='["timelineMonth"]'
     currentView="timelineMonth"
     [firstDayOfWeek]="0"
     [startDayHour]="8"
     [endDayHour]="20"
     [cellDuration]="60"
-    [groups]="['priority']"
     [currentDate]="currentDate"
     [height]="580"
-    (onAppointmentAdded)="onAppointmentAdded($event)"
+    appointmentTemplate="appointment-template"
+    appointmentTooltipTemplate="tooltip-template"
     (onAppointmentFormOpening)="onAppointmentFormOpening($event)"
-    >
-    <dxi-resource
-        fieldExpr="ownerId"
-        [allowMultiple]="true"
-        [dataSource]="resourcesData"
-        label="Owner"
+    (onAppointmentAdded)="onAppointmentAdded($event)">
+
+    <dxi-resource 
+        fieldExpr="eventId"
         [useColorAsDefault]="true"
-    ></dxi-resource>
-    <dxi-resource
-        fieldExpr="priority"
-        [allowMultiple]="false"
-        [dataSource]="prioritiesData"
-        label="Priority"
-    ></dxi-resource>
+        [dataSource]="eventsData">
+    </dxi-resource>
+    
+    <div *dxTemplate="let model of 'appointment-template'">
+        <div class='showtime-preview'>
+            <div>
+                {{getEventById(model.appointmentData.eventId).text}}
+            </div>
+            <div>
+                {{'Participants: ' + getEventById(model.appointmentData.eventId).participants}}
+            </div>
+        </div>
+    </div>
+    
+    <div *dxTemplate="let model of 'tooltip-template'">
+    
+        <div class="dx-tooltip-appointment-item">
+            <div class="dx-tooltip-appointment-item-marker">
+                <div class="dx-tooltip-appointment-item-marker-body" 
+                    [style.background]="getEventById(model.appointmentData.eventId).color">
+                </div>
+            </div>
+            <div class="dx-tooltip-appointment-item-content">
+                <div class="dx-tooltip-appointment-item-content-subject">
+                    {{getEventById(model.appointmentData.eventId).text}}
+                </div>
+                <div class="dx-tooltip-appointment-item-content-date">
+                    {{'Participants: ' + getEventById(model.appointmentData.eventId).participants}}
+                </div>
+                <div class="dx-tooltip-appointment-item-content-date">
+                    From: {{ model.appointmentData.startDate  | date }}
+                </div>
+                <div class="dx-tooltip-appointment-item-content-date">
+                    To: {{ model.appointmentData.endDate | date }}
+                </div>
+                <div class="dx-tooltip-appointment-item-content-date">
+                    {{'Baseline Forecast: ' + getEventById(model.appointmentData.eventId).baseline}}
+                </div>
+                <div class="dx-tooltip-appointment-item-content-date">
+                    {{'Global Event Uplift: ' + getEventById(model.appointmentData.eventId).uplift}}
+                </div>
+            </div>
+    
+            <div class="dx-tooltip-appointment-item-delete-button-container">
+                <div class="dx-tooltip-appointment-item-delete-button dx-button dx-button-normal dx-button-mode-text dx-widget dx-button-has-icon"
+                    role="button" aria-label="trash" tabindex="0">
+                    <div class="dx-button-content" (click)="$event.stopPropagation()"><i class="dx-icon dx-icon-trash"
+                            (click)="deleteAppointment(model)"></i></div>
+                </div>
+            </div>
+        </div>
+    
+    
+    
+    
+    </div>
 </dx-scheduler>

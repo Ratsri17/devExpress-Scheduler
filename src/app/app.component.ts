@@ -1,31 +1,101 @@
 import { Component, ViewChild } from '@angular/core';
-
-import { Priority, Resource, Appointment, AppService } from './app.service';
+import { DxSchedulerComponent } from 'devextreme-angular';
+import { AppService, EventData, Data } from './app.service';
+import Query from 'devextreme/data/query';
 
 @Component({
-    styleUrls: ['./app.component.css'],
     selector: 'app-root',
     templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css'],
     providers: [AppService]
 })
 export class AppComponent {
-    appointmentsData: Appointment[];
-    resourcesData: Resource[];
-    prioritiesData: Priority[];
-    currentDate: Date = new Date(2017, 4, 1);
+    @ViewChild(DxSchedulerComponent, { static: false }) scheduler: DxSchedulerComponent;
+
+    data: Data[];
+    currentDate: Date = new Date();
+    eventsData: EventData[];
 
     constructor(service: AppService) {
-        this.appointmentsData = service.getAppointments();
-        this.resourcesData = service.getResources();
-        this.prioritiesData = service.getPriorities();
+        this.data = service.getData();
+        this.eventsData = service.getEventsData();
     }
 
-    onAppointmentAdded(e) {
-        const appointmentData = e.appointmentData;
-        console.log(appointmentData);
+    onAppointmentFormOpening(data) {
+        const that = this;
+        const form = data.form;
+        const eventInfo = that.getEventById(data.appointmentData.eventId) || {};
+
+        form.option('items', [{
+            label: {
+                text: 'Event'
+            },
+            editorType: 'dxTextBox',
+            dataField: 'eventId',
+            editorOptions: {
+                value: eventInfo.events,
+                displayExpr: 'text',
+                valueExpr: 'id'
+            }
+        }, {
+            label: {
+                text: 'Participants'
+            },
+            name: 'participants',
+            editorType: 'dxTextBox',
+            editorOptions: {
+                value: eventInfo.participants
+            }
+        }, {
+            label: {
+                text: 'Baseline Forecast'
+            },
+            name: 'baseline',
+            editorType: 'dxTextBox',
+            editorOptions: {
+                value: eventInfo.participants
+            }
+        }, {
+            label: {
+                text: 'Event Uplift'
+            },
+            name: 'uplift',
+            editorType: 'dxTextBox',
+            editorOptions: {
+                value: eventInfo.participants
+            }
+        }, {
+            dataField: 'startDate',
+            editorType: 'dxDateBox',
+            editorOptions: {
+                width: '100%',
+                type: 'datetime'
+            }
+        }, {
+            name: 'endDate',
+            dataField: 'endDate',
+            editorType: 'dxDateBox',
+            editorOptions: {
+                width: '100%',
+                type: 'datetime'
+            }
+        }]);
     }
 
-    onAppointmentFormOpening(e) {
-        console.log('Worked ', e);
+    onAppointmentAdded(data) {
+        console.log('Data ', data);
+    }
+
+    deleteAppointment(e) {
+        this.scheduler.instance.deleteAppointment(e.appointmentData);
+        this.scheduler.instance.hideAppointmentTooltip();
+    }
+
+    getEventById(id) {
+        return Query(this.eventsData).filter(['id', '=', id]).toArray()[0];
+    }
+
+    getDateById(id) {
+        return Query(this.data).filter(['eventId', '=', id]).toArray()[0];
     }
 }

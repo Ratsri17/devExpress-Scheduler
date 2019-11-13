@@ -2,13 +2,15 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import { AppComponent } from './app.component';
-import {DxSchedulerModule, DxContextMenuModule} from 'devextreme-angular';
+import {DxSchedulerModule, DxTemplateModule, DxButtonModule, DxTooltipModule} from 'devextreme-angular';
 
 @NgModule({
   imports: [
       BrowserModule,
       DxSchedulerModule,
-      DxContextMenuModule
+      DxTemplateModule,
+      DxButtonModule,
+      DxTooltipModule
   ],
   declarations: [AppComponent],
   bootstrap: [AppComponent]
